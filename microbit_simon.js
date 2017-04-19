@@ -9,8 +9,8 @@ let intButton = 0
 let freq = 0
 let init = 0
 basic.forever(() => {
-    if (pins.digitalReadPin(DigitalPin.P1) == 1) {
-        // led.toggle(0, 0)
+    // Pin 16 = A (Green)
+    if (pins.digitalReadPin(DigitalPin.P16) == 1) {
         basic.pause(100)
         basic.showIcon(IconNames.Heart)
     } else {
@@ -20,14 +20,13 @@ basic.forever(() => {
 pins.onPulsed(DigitalPin.P2, PulseValue.Low, () => {
     basic.showNumber(pins.pulseIn(DigitalPin.P2, PulseValue.Low))
     intButton = 1
-    // led.toggle(2, 2)
     basic.pause(100)
 })
-init = 1
+init = 1    //Go into 'initialise' mode
 freq = 0
 pins.analogSetPitchPin(AnalogPin.P0)
-length = 31
-Neo = neopixel.create(DigitalPin.P0, 4, NeoPixelMode.RGB)
+length = 31     //The maximum number of 'rounds' of the game
+Neo = neopixel.create(DigitalPin.P8, 4, NeoPixelMode.RGB)   //Set Pin (8) for the AdaFruit NeoPixel output
 light = 0
 level = 1
 NeoColor = 0
@@ -46,7 +45,7 @@ for (let i = 0; i <= 31 - 1; i++) {
     }
     basic.pause(delay)
 }
-function setSequence() {
+function setSequence() {        //Create a random sequence of (lights)
     sequence =[]
     for (let j = 1; j < 31; j++) {
         sequence.push(Math.random(4))
@@ -77,9 +76,9 @@ function showSequence(length: number): void {
             NeoColor = 0x0000FF
             freq = 209
         }
-        Neo.setPixelColor(light, neopixel.colors(NeoColor))
-        Neo.show()
-        music.playTone(freq, music.beat(gap))
+        Neo.setPixelColor(light, neopixel.colors(NeoColor))     //Set the chosen LED number & colour
+        Neo.show()      //Display the chosen LED
+        music.playTone(freq, music.beat(gap))   //Play a note at freq Hz for 'gap' ms
         //pins.analogPitch(freq, gap)
         Neo.clear()
         Neo.show()
