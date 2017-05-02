@@ -8,45 +8,102 @@
  * Custom blocks
  */
 //% weight=100 color=#0fbc11 icon=""
-namespace custom {
+namespace Simon {
+
     /**
-     * Sounds the beeper and lights LED
-     * for the 'corner' specified
+     * Show selected NeoPixel LED with associated tone
+     * @param pad LED to light, eg: 1
+     * @param duration length of the tone (ms), eg: 20
+     * @param wait pause after the tone has played (ms), eg: 20
      */
     //% block
-    export function LightBeep(corner: number) {
-        switch (corner) {
+    export function LEDBeep(pad: number, duration: number, wait: number) {
+        //if (pad == 4) {
+        //for (let i = 0; i <= 3; i++) {
+        //NeoOn(i)
+        //Beep(pad, duration / 2)
+        //NeoOff()
+        //}
+        //} else {
+        NeoOn(pad)
+        Beep(pad, duration)
+        if (wait > 0) {
+            basic.pause(wait)
+        }
+        NeoOff()
+        //}
+
+    }
+
+    /**
+     * Show selected NeoPixel LED
+     * @param pad LED to light, eg: 1
+     */
+    //% block
+    export function NeoOn(pad: number) {
+        let NeoColor = 0
+        switch (pad) {
             case 0:
-                //Green
-                NeoColor = 0x00FF00
-                freq = 415
+                NeoColor = NeoPixelColors.Green
                 break
             case 1:
-                //Red
-                NeoColor = 0xFF0000
-                freq = 310
+                NeoColor = NeoPixelColors.Red
                 break
             case 2:
-                //Yellow
-                NeoColor = 0xFFFF00
-                freq = 252
+                NeoColor = NeoPixelColors.Yellow
                 break
             case 3:
-                //Blue
-                NeoColor = 0x0000FF
-                freq = 209
+                NeoColor = NeoPixelColors.Blue
         }
-        //Change the tone if a mistake is made, but keep the light the same
-        if (mistake) {
-            freq = 42
-            gap = 2000
-        }
-        Neo.setPixelColor(corner, neopixel.colors(NeoColor)) //Set the chosen LED number & colour
-        Neo.show() //Display the chosen LED
-        music.playTone(freq, music.beat(gap)) //Play a note at freq Hz for 'gap' ms
-        //pins.analogPitch(freq, gap)
+        Neo.setPixelColor(pad, NeoColor)
+        Neo.show()
+    }
+
+    /**
+     * Clear all NeoPixel LEDs
+     */
+    //% block
+    export function NeoOff() {
         Neo.clear()
         Neo.show()
-        basic.pause(50) //0.05 second pause between each light / tone
+    }
+
+    /**
+     * Play tone associated with the given pad
+     * @param pad pad activated, eg: 1
+     * @param duration length of the tone (ms), eg: 420
+     */
+    //% block
+    export function Beep(pad: number, duration: number) {
+        let tone = 0
+        if (mistake) { tone = 42 } else { tone = pitch[pad] }
+        music.playTone(tone, duration)
+    }
+
+    /**
+     * Special error tone for winning sequence
+     */
+    //% block
+    export function EndBuzz() {
+        let j = 0
+        for (let i = 2; i <= 11; i++) {
+            j = i % 4
+            Simon.NeoOn(j)
+            pins.analogPitch(42, 100)
+            Simon.NeoOff()
+        }
+    }
+    /**
+     * React to a pad being tapped, checking to see if it's the correct result
+     * @param p pad activated, eg: 0
+     */
+    //% block
+    export function checkPress(p: number) {
+        //Check if the button pressed is correct
+        mistake = (p != sequence[m])
+        m += 1
+        Simon.LEDBeep(p, gap, 80)
+        //Reset the timeOut timer each time a button is pressed
+        start = input.runningTime()
     }
 }
