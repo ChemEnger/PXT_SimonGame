@@ -76,7 +76,7 @@ while (!(mistake)) {
     }
     //Sound / show the current sequence
     for (let j = 0; j <= i; j++) {
-        custom.LightBeep(sequence[j])
+        Simon.LEDBeep(sequence[j],420,50)
     }
     start = input.runningTime()
     while (!(mistake) && i <= length) {
@@ -134,7 +134,7 @@ function checkPress(pressed: number): void {
     //Check if the button pressed is correct
     mistake = (pressed != sequence[m])
     m += 1
-    custom.LightBeep(pressed)
+    Simon.LEDBeep(pressed,420,50)
     //Reset the timeOut timer each time a button is pressed
     start = input.runningTime()
 }
